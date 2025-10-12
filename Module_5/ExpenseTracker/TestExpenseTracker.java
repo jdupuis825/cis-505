@@ -32,7 +32,7 @@ public class TestExpenseTracker {
             // Validate menu selection.
             int input = ValidatorIO.getInt(sc, "\n Please choose an option: ");
 
-            // Option 1: View Transactions.
+            // Option 1: Allows users to view transactions.
             if (input == 1) {
                 try {
                     ArrayList<Transaction> transactions = TransactionIO.findAll();
@@ -46,11 +46,11 @@ public class TestExpenseTracker {
                     System.out.println("\n Exception: " + e.getMessage());
                 }
 
-                // Prompt to continue.
+                // Prompts user to continue or not.
                 choice = ValidatorIO.getString(sc, "\n Continue? (y/n): ");
             }
 
-            // Option 2: Add Transactions.
+            // Option 2: Allows user to add transactions.
             else if (input == 2) {
                 String c = "y";
                 ArrayList<Transaction> transactions = new ArrayList<>();
@@ -70,18 +70,18 @@ public class TestExpenseTracker {
                     c = ValidatorIO.getString(sc, "\n Add another transaction? (y/n): ");
                 }
 
-                // Write transactions to file.
+                // Writes transactions to file.
                 try {
                     TransactionIO.bulkInsert(transactions);
                 } catch (IOException e) {
                     System.out.println("\n Exception: " + e.getMessage());
                 }
 
-                // Prompt to continue.
+                // Prompt user to continue or not.
                 choice = ValidatorIO.getString(sc, "\n Continue? (y/n): ");
             }
 
-            // Option 3: View Expense Total.
+            // Option 3: Allows user to view expense total.
             else if (input == 3) {
                 try {
                     ArrayList<Transaction> transactions = TransactionIO.findAll();
@@ -97,11 +97,11 @@ public class TestExpenseTracker {
                     System.out.println("\n Exception: " + e.getMessage());
                 }
 
-                // Prompt to continue.
+                // Prompts user to continue or not.
                 choice = ValidatorIO.getString(sc, "\n Continue? (y/n): ");
             }
 
-            // Invalid input.
+            // Invalid input display.
             else {
                 System.out.println("\n Invalid option.");
                 choice = ValidatorIO.getString(sc, "\n Continue? (y/n): ");
