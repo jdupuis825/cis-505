@@ -1,4 +1,3 @@
-package src;
 /*
     Liang, Y.D. (2019). Introduction to Java Programming and Data Structures: 
         Comprehensive Version (12th ed.). Pearson Education, Inc.
@@ -103,27 +102,26 @@ public class DupuisEnhancedFutureValueApp extends Application {
     private static String getTodayDate() {
         SimpleDateFormat formatter = new SimpleDateFormat("MM/dd/yyyy");
         return formatter.format(new Date());
-}
-
-
-
-private void displayResults() {
-    try {
-        double monthlyPayment = Double.parseDouble(txtMonthlyPayment.getText());
-        double interestRate = Double.parseDouble(txtInterestRate.getText());
-        int years = cboYears.getValue();
-
-        double futureValue = FinanceCalculator.calculateFutureValue(monthlyPayment, interestRate, years);
-
-        lblFutureValueDate.setText("Calculation as of " + getTodayDate());
-        txtResults.setText(String.format("The future value is $%,.2f", futureValue));
-    } catch (NumberFormatException ex) {
-        txtResults.setText("Please enter valid numeric values for payment and interest rate.");
     }
-}
 
-    
 
+    // Calculates and displays values based on input
+    private void displayResults() {
+        try {
+            double monthlyPayment = Double.parseDouble(txtMonthlyPayment.getText());
+            double interestRate = Double.parseDouble(txtInterestRate.getText());
+            int years = cboYears.getValue();
+
+            double futureValue = FinanceCalculator.calculateFutureValue(monthlyPayment, interestRate, years);
+
+            lblFutureValueDate.setText("Calculation as of " + getTodayDate());
+            txtResults.setText(String.format("The future value is $%,.2f", futureValue));
+        } catch (NumberFormatException ex) {
+            txtResults.setText("Please enter valid numeric values for payment and interest rate.");
+        }
+    }
+
+    // Clear all inout fields ad results
     private void clearFormFields() {
         txtMonthlyPayment.clear();
         txtInterestRate.clear();
