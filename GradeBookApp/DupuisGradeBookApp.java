@@ -14,6 +14,8 @@ import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.Priority;
 import javafx.stage.Stage;
 
+import java.io.*; // NEW: for CSV file writing/reading
+
 public class DupuisGradeBookApp extends Application {
 
     @Override
@@ -47,8 +49,15 @@ public class DupuisGradeBookApp extends Application {
         // Create Buttons
         // ----------------------------
         Button clearButton = new Button("Clear");         // Clears the form fields
-        Button viewButton = new Button("View Grades");    // Will display saved grades (next week)
-        Button saveButton = new Button("Save Entry");     // Will save grade entry to CSV (next week)
+        Button viewButton = new Button("View Grades");    // Displays saved grades
+        Button saveButton = new Button("Save Entry");     // Saves grade entry to CSV
+
+        // ----------------------------
+        // NEW: Create TextArea for Grades Display
+        // ----------------------------
+        TextArea gradesDisplay = new TextArea();
+        gradesDisplay.setEditable(false); // read-only
+        gradesDisplay.setPrefHeight(150); // give it space
 
         // ----------------------------
         // Layout: GridPane for Form Fields
@@ -81,29 +90,97 @@ public class DupuisGradeBookApp extends Application {
         formGrid.add(gradeComboBox, 1, 3);
         GridPane.setHalignment(gradeComboBox, HPos.RIGHT);
 
-        // -----------------------------
-// Layout: HBox for Buttons
-// -----------------------------
-clearButton.setPrefWidth(100);
-viewButton.setPrefWidth(100);
-saveButton.setPrefWidth(100);
-
-HBox buttonBox = new HBox(20); // 20px spacing between buttons
-buttonBox.getChildren().addAll(clearButton, viewButton, saveButton);
-buttonBox.setAlignment(Pos.CENTER_RIGHT); // Align buttons to the right
+        // ----------------------------
+        // Layout: View Button (above TextArea)
+        // ----------------------------
+        saveButton.setPrefWidth(120);
+        HBox saveBox = new HBox(saveButton);
+        saveBox.setAlignment(Pos.CENTER_RIGHT);
 
 
 
         // ----------------------------
-        // Main Layout: VBox to stack form and buttons
+        // Layout: Save and Clear Buttons (below TextArea)
         // ----------------------------
-        VBox mainLayout = new VBox(15, formGrid, buttonBox); // Vertical layout with spacing
-        mainLayout.setStyle("-fx-padding: 20;"); // Add padding around the layout
+        clearButton.setPrefWidth(120);
+        viewButton.setPrefWidth(120);
+        VBox clearViewBox = new VBox(10, clearButton, viewButton);
+        clearViewBox.setAlignment(Pos.CENTER_RIGHT);
+
+
+        // ----------------------------
+        // NEW: Event Handlers
+        // ----------------------------
+
+        // Clear button: reset all fields and text area
+        clearButton.setOnAction(e -> {
+            firstNameField.clear();
+            lastNameField.clear();
+            courseComboBox.getSelectionModel().clearSelection();
+            gradeComboBox.getSelectionModel().clearSelection();
+            gradesDisplay.clear();
+        });
+
+        // Save button: create Student object, write to CSV, show in TextArea
+        saveButton.setOnAction(e -> {
+            Student student = new Student(
+                firstNameField.getText(),
+                lastNameField.getText(),
+                courseComboBox.getValue(),
+                gradeComboBox.getValue()
+            );
+
+            try {
+                File file = new File("grades.csv");
+                boolean fileExists = file.exists();
+
+                try (FileWriter writer = new FileWriter(file, true);
+                     PrintWriter out = new PrintWriter(writer)) {
+
+                    // If file is new/empty, write header first
+                    if (!fileExists || file.length() == 0) {
+                        out.println("firstName, lastName, course, and grade");
+                    }
+
+                    out.println(student.getFirstName() + ", " +
+                    student.getLastName() + ", " +
+                    student.getCourse() + ", " +
+                    student.getGrade());
+
+                }
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
+
+            // Show in TextArea using toString()
+            gradesDisplay.appendText(student.toString() + "\n");
+        });
+
+        // View button: read CSV and display contents
+        viewButton.setOnAction(e -> {
+            gradesDisplay.clear();
+            try (BufferedReader reader = new BufferedReader(new FileReader("grades.csv"))) {
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    gradesDisplay.appendText(line + "\n");
+                }
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
+        });
+
+        // ----------------------------
+        // Main Layout: VBox to stack form, buttons, and TextArea
+        // ----------------------------
+        VBox mainLayout = new VBox(15, formGrid, saveBox, gradesDisplay, clearViewBox);
+        mainLayout.setStyle("-fx-padding: 20;");
+
+
 
         // ----------------------------
         // Set Scene and Show Stage
         // ----------------------------
-        Scene scene = new Scene(mainLayout, 400, 300); // Set window size
+        Scene scene = new Scene(mainLayout, 400, 550); // Increased height for TextArea
         primaryStage.setScene(scene);
         primaryStage.show(); // Display the window
     }
